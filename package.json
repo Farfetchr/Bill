@@ -1,0 +1,27 @@
+{
+    "name": "Bill",
+    "version": "0.0.0",
+    "description": "A Discord bot to look up Pokemon i   n Farfetchr", 
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/farfetchr/bill.git"
+    },
+    "author": "Farfetchr <https://farfetchr.io>",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/scryfall/farfetchr/issues"
+    },
+    "homepage": "https://github.com/farfetchr/bill#readme",
+    "dependencies": {
+      "discord.js": "^11.0.0",
+      "request": "^2.79.0",
+      "request-promise-native": "^1.0.3",
+      "urijs": "^1.18.4"
+    }
+  }
+  

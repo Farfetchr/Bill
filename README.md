@@ -1,2 +1,2 @@
 # Bill
-A Discord bot to look up pokmon on Farfetchr
+A Discord bot to look up Pokemon in Farfetchr
