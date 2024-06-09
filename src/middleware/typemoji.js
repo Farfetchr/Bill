@@ -23,7 +23,7 @@ module.exports = (client, embed) => {
     Object.keys(emojiMap)
       .forEach(t => {
         const emoji = client.emojis.cache.find(e => e.name === emojiMap[t]);
-        str = str.replace(t, emoji ? `<:${emoji.name}:${emoji.id}>` : t);
+        str = str.replace(t, emoji ? `${t} <:${emoji.name}:${emoji.id}>` : t);
       }
     );
     return str;

@@ -29,14 +29,6 @@ class Response {
     });
   }
 
-  buildStatLine(pokemon) {
-    let statline = '';
-    statline += `HP: ${pokemon.hp} SpAtk: ${pokemon.specAttack}\n`;
-    statline += `Atk: ${pokemon.attack} SpDef: ${pokemon.specDefense}\n`;
-    statline += `Def: ${pokemon.hp} Speed: ${pokemon.speed}\n`;
-    return statline;
-  }
-
   buildAbilities(pokemon, embed) {
     embed.addFields(
       { name: 'Abilities', value: `${pokemon.ability1.name}\n${pokemon.ability2 ? pokemon.ability2.name : '\u200B'}`, inline: true }
@@ -63,7 +55,8 @@ class Response {
         .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${type}`)
         .setURL(this.returnUrl + pokemon.id)
         .addFields(
-          { name: 'Stats', value: this.buildStatLine(pokemon) },
+          { name: 'Stats', value: `HP: ${pokemon.hp}\nAtk: ${pokemon.attack}\nDef: ${pokemon.hp}`, inline: true},
+          { name: '\u200B', value: `SpAtk: ${pokemon.specAttack}\nSpDef: ${pokemon.specDefense}\nSpeed: ${pokemon.speed}`, inline: true },
           { name: '\u200B', value: '\u200B' }
         )
         .setThumbnail('https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/' + pokemon.id + '.png')
