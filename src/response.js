@@ -62,6 +62,7 @@ class Response {
       const type = pokemon.type2
         ? `${pokemon.type1}/${pokemon.type2}`
         : `${pokemon.type1}`;
+      const color = this.getTypeColor(pokemon.type1.toLowerCase());
       const embed = new EmbedBuilder()
         .setTitle(`${pokemon.name} #${pokemon.pokedexNumber}`)
         .setURL(this.returnUrl + pokemon.id)
@@ -78,7 +79,7 @@ class Response {
           },
           { name: "\u200B", value: "\u200B" }
         )
-        .setColor(0x0099FF)
+        .setColor(color)
         .setThumbnail(
           "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/" +
             pokemon.id +
@@ -98,6 +99,47 @@ class Response {
         })
         .setDescription(`No results found for ${this.pokemonName}`);
       return embed;
+    }
+  }
+
+  getTypeColor(type) {
+    switch (type) {
+      case "fire":
+        return 0x00f08030;
+      case "grass":
+        return 0x0078c850;
+      case "poison":
+        return 0x00a040a0;
+      case "normal":
+        return 0x00a8a878;
+      case "fighting":
+        return 0x00c03028;
+      case "water":
+        return 0x006890f0;
+      case "flying":
+        return 0x00a890f0;
+      case "electric":
+        return 0x00f8d030;
+      case "ground":
+        return 0x00e0c068;
+      case "psychic":
+        return 0x00f85888;
+      case "rock":
+        return 0x00b8a038;
+      case "ice":
+        return 0x0098d8d8;
+      case "bug":
+        return 0x00a8b820;
+      case "dragon":
+        return 0x007038f8;
+      case "ghost":
+        return 0x00705898;
+      case "dark":
+        return 0x00705848;
+      case "steel":
+        return 0x00b8b8d0;
+      case "fairy":
+        return 0x00ee99ac;
     }
   }
 
