@@ -82,7 +82,7 @@ class Response {
         : "";
       const embed = new EmbedBuilder()
         .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
-        .setURL(this.returnUrl + pokemon.id)
+        .setURL(`${this.returnUrl}${pokemon.id}&versionId=${this.versionId}`)
         .addFields(
           {
             name: "Stats",
@@ -133,7 +133,7 @@ class Response {
 }
 
 Response.prototype.middleware = [typemoji, utm];
-Response.prototype.url = "http://localhost:5000/api/Bill/";
+Response.prototype.url = "https://farfetchr.io/api/Bill/";
 Response.prototype.returnUrl = "https://farfetchr.io/pokemon?id=";
 Response.prototype.iconURL =
   "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/farfetchr.png";
