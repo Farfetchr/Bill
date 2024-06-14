@@ -1,4 +1,4 @@
-const Response = require('./response');
+const Response = require("./response");
 
 class Messenger {
   constructor(client, msg) {
@@ -9,24 +9,40 @@ class Messenger {
 
     const matches = msg.content.match(this.pattern);
     if (matches) {
-      const match = matches[0].replaceAll('{', '').replaceAll('}', '');
-        const pokemonName = match;
-        const promise = this.makePromise(pokemonName);
-        this.promises.push(promise);
+      const match = matches[0].replaceAll("{", "").replaceAll("}", "");
+      const piped = match.split("|");
+
+      let pokemonName = "";
+      let versionText = "";
+
+      if (piped.length > 1) {
+        pokemonName = piped[0].trim();
+        versionText = piped[1].trim();
+        console.log(pokemonName);
+        console.log(versionText);
+      } else {
+        pokemonName = match;
+      }
+      const promise = this.makePromise(pokemonName, versionText);
+      this.promises.push(promise);
     }
-    Promise.all(this.promises).then(embeds => {
-      embeds.forEach(embed => {
-        this.msg.channel.send({ embeds: [embed] });
-      });
-    }).catch(err => console.log(err));
+    Promise.all(this.promises)
+      .then((embeds) => {
+        embeds.forEach((embed) => {
+          this.msg.channel.send({ embeds: [embed] });
+        });
+      })
+      .catch((err) => console.log(err));
   }
 
-  makePromise(pokemonName) {
+  makePromise(pokemonName, versionText) {
     return new Promise((resolve, reject) => {
       try {
-        new Response(this.client, pokemonName).embed().then(embed => {
-          resolve(embed);
-        });
+        new Response(this.client, pokemonName, versionText)
+          .standardEmbed()
+          .then((embed) => {
+            resolve(embed);
+          });
       } catch (err) {
         reject(err);
       }

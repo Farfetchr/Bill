@@ -1,17 +1,25 @@
 const request = require("request-promise-native");
-
 const typemoji = require("./middleware/typemoji");
 const utm = require("./middleware/utm");
+const { getVersionId, getTypeColor } = require("./utils");
+
 const { EmbedBuilder } = require("@discordjs/builders");
 
 class Response {
-  constructor(client, pokemonName) {
+  constructor(client, pokemonName, versionText) {
     this.client = client;
     this.pokemonName = pokemonName;
+    this.versionText = versionText;
+    this.versionId;
   }
 
   makeUrl() {
-    return this.url + this.pokemonName;
+    if (this.versionText) {
+      this.versionId = getVersionId(this.versionText);
+      return `${this.url}${this.pokemonName}/${this.versionId}`;
+    } else {
+      return this.url + this.pokemonName;
+    }
   }
 
   makeRequest() {
@@ -31,40 +39,49 @@ class Response {
   }
 
   buildAbilities(pokemon, embed) {
-    embed.addFields({
-      name: "Abilities",
-      value: `${pokemon.ability1.name}\n${
-        pokemon.ability2 ? pokemon.ability2.name : "\u200B"
-      }`,
-      inline: true,
-    });
+    if (!this.versionId || this.versionId >= 3) {
+      embed.addFields(
+        { name: "\u200B", value: "\u200B" },
+        {
+          name: "Abilities",
+          value: `${pokemon.ability1.name}\n${
+            pokemon.ability2 ? pokemon.ability2.name : "\u200B"
+          }`,
+          inline: true,
+        }
+      );
+      if (!this.versionId || this.versionId == 11 || this.versionId >= 14) {
+        if (pokemon.hiddenAbility) {
+          embed.addFields({
+            name: "Hidden Ability",
+            value: pokemon.hiddenAbility.name,
+            inline: true,
+          });
+        }
+      }
 
-    if (pokemon.hiddenAbility) {
-      embed.addFields({
-        name: "Hidden Ability",
-        value: pokemon.hiddenAbility.name,
-        inline: true,
-      });
-    }
-
-    if (pokemon.teraAbility) {
-      embed.addFields({
-        name: "Terastallized Ability",
-        value: pokemon.teraAbility.name,
-        inline: true,
-      });
+      if (pokemon.teraAbility) {
+        embed.addFields({
+          name: "Terastallized Ability",
+          value: pokemon.teraAbility.name,
+          inline: true,
+        });
+      }
     }
   }
 
-  createEmbed(response) {
+  createPokemonEmbed(response) {
     const pokemon = JSON.parse(response.body);
     if (pokemon.id) {
       const type = pokemon.type2
         ? `${pokemon.type1}/${pokemon.type2}`
         : `${pokemon.type1}`;
-      const color = this.getTypeColor(pokemon.type1.toLowerCase());
+      const color = getTypeColor(pokemon.type1.toLowerCase());
+      const versionText = this.versionText
+        ? `(${this.versionText.toUpperCase()})`
+        : "";
       const embed = new EmbedBuilder()
-        .setTitle(`${pokemon.name} #${pokemon.pokedexNumber}`)
+        .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
         .setURL(this.returnUrl + pokemon.id)
         .addFields(
           {
@@ -76,8 +93,7 @@ class Response {
             name: "\u200B",
             value: `SpAtk: ${pokemon.specAttack}\nSpDef: ${pokemon.specDefense}\nSpeed: ${pokemon.speed}`,
             inline: true,
-          },
-          { name: "\u200B", value: "\u200B" }
+          }
         )
         .setColor(color)
         .setThumbnail(
@@ -102,51 +118,10 @@ class Response {
     }
   }
 
-  getTypeColor(type) {
-    switch (type) {
-      case "fire":
-        return 0x00f08030;
-      case "grass":
-        return 0x0078c850;
-      case "poison":
-        return 0x00a040a0;
-      case "normal":
-        return 0x00a8a878;
-      case "fighting":
-        return 0x00c03028;
-      case "water":
-        return 0x006890f0;
-      case "flying":
-        return 0x00a890f0;
-      case "electric":
-        return 0x00f8d030;
-      case "ground":
-        return 0x00e0c068;
-      case "psychic":
-        return 0x00f85888;
-      case "rock":
-        return 0x00b8a038;
-      case "ice":
-        return 0x0098d8d8;
-      case "bug":
-        return 0x00a8b820;
-      case "dragon":
-        return 0x007038f8;
-      case "ghost":
-        return 0x00705898;
-      case "dark":
-        return 0x00705848;
-      case "steel":
-        return 0x00b8b8d0;
-      case "fairy":
-        return 0x00ee99ac;
-    }
-  }
-
-  embed() {
+  standardEmbed() {
     return new Promise((resolve, reject) => {
       this.makeRequest().then((response) => {
-        let embed = this.createEmbed(response);
+        let embed = this.createPokemonEmbed(response);
         this.middleware.length > 0 &&
           this.middleware.forEach((mw) => {
             embed = mw(this.client, embed);
@@ -158,7 +133,7 @@ class Response {
 }
 
 Response.prototype.middleware = [typemoji, utm];
-Response.prototype.url = "http://localhost:5000/api/Pokemon/";
+Response.prototype.url = "http://localhost:5000/api/Bill/";
 Response.prototype.returnUrl = "https://farfetchr.io/pokemon?id=";
 Response.prototype.iconURL =
   "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/farfetchr.png";
