@@ -1,16 +1,11 @@
-const request = require("request-promise-native");
-const typemoji = require("./middleware/typemoji");
-const utm = require("./middleware/utm");
-const { getVersionId, getTypeColor } = require("./utils");
+const BaseResponse = require("./baseResponse");
+const { getVersionId, getTypeColor } = require("../utils");
 
 const { EmbedBuilder } = require("@discordjs/builders");
 
-class Response {
+class NameSearchResponse extends BaseResponse {
   constructor(client, pokemonName, versionText) {
-    this.client = client;
-    this.pokemonName = pokemonName;
-    this.versionText = versionText;
-    this.versionId;
+    super(client, pokemonName, versionText);
   }
 
   makeUrl() {
@@ -20,22 +15,6 @@ class Response {
     } else {
       return this.url + this.pokemonName;
     }
-  }
-
-  makeRequest() {
-    return new Promise((resolve, reject) => {
-      request({
-        method: "GET",
-        resolveWithFullResponse: true,
-        uri: this.makeUrl(),
-      })
-        .then((response) => {
-          resolve(response);
-        })
-        .catch((err) => {
-          resolve(err.response);
-        });
-    });
   }
 
   buildAbilities(pokemon, embed) {
@@ -80,9 +59,10 @@ class Response {
       const versionText = this.versionText
         ? `(${this.versionText.toUpperCase()})`
         : "";
+      const versionParam = this.versionText ? `&versionId=${this.versionId}` : '';
       const embed = new EmbedBuilder()
         .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
-        .setURL(`${this.returnUrl}${pokemon.id}&versionId=${this.versionId}`)
+        .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
         .addFields(
           {
             name: "Stats",
@@ -107,7 +87,7 @@ class Response {
       return embed;
     } else {
       const embed = new EmbedBuilder()
-        .setURL(this.returnUrl + pokemon.id)
+        .setURL("https://farfetchr.io")
         .setAuthor({
           name: "Farfetchr",
           iconURL: this.iconURL,
@@ -132,10 +112,4 @@ class Response {
   }
 }
 
-Response.prototype.middleware = [typemoji, utm];
-Response.prototype.url = "https://farfetchr.io/api/Bill/";
-Response.prototype.returnUrl = "https://farfetchr.io/pokemon?id=";
-Response.prototype.iconURL =
-  "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/farfetchr.png";
-
-module.exports = Response;
+module.exports = NameSearchResponse;

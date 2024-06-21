@@ -1,4 +1,5 @@
-const Response = require("./response");
+const NameSearchResponse = require("./responses/nameSearchResponse");
+const MoveSearchResponse = require("./responses/moveSearchResponse");
 
 class Messenger {
   constructor(client, msg) {
@@ -15,14 +16,31 @@ class Messenger {
       let pokemonName = "";
       let versionText = "";
 
-      if (piped.length > 1) {
-        pokemonName = piped[0].trim();
-        versionText = piped[1].trim();
+      if (match.startsWith('!')) {
+        const firstSpaceIndex = match.indexOf(' ');
+        pokemonName = match.substring(1, firstSpaceIndex);
+
+        let methodOrName = "";
+
+        if (piped.length > 1) {
+          methodOrName = piped[0].substring(firstSpaceIndex + 1).trim();
+          versionText = piped[1].trim();
+        } else {
+          methodOrName = match.substring(firstSpaceIndex + 1);
+        }
+        const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
+        this.promises.push(promise);
       } else {
-        pokemonName = match;
+        if (piped.length > 1) {
+          pokemonName = piped[0].trim();
+          versionText = piped[1].trim();
+        } else {
+          pokemonName = match;
+        }
+
+        const promise = this.makeNameSearchPromise(pokemonName, versionText);
+        this.promises.push(promise);
       }
-      const promise = this.makePromise(pokemonName, versionText);
-      this.promises.push(promise);
     }
     Promise.all(this.promises)
       .then((embeds) => {
@@ -33,11 +51,25 @@ class Messenger {
       .catch((err) => console.log(err));
   }
 
-  makePromise(pokemonName, versionText) {
+  makeNameSearchPromise(pokemonName, versionText) {
     return new Promise((resolve, reject) => {
       try {
-        new Response(this.client, pokemonName, versionText)
+        new NameSearchResponse(this.client, pokemonName, versionText)
           .standardEmbed()
+          .then((embed) => {
+            resolve(embed);
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  makeMoveSearchPromise(pokemonName, methodOrName, versionText) {
+    return new Promise((resolve, reject) => {
+      try {
+        new MoveSearchResponse(this.client, pokemonName, methodOrName, versionText)
+          .moveEmbed()
           .then((embed) => {
             resolve(embed);
           });
