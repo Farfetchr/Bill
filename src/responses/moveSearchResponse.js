@@ -55,7 +55,7 @@ class MoveSearchResponse extends BaseResponse {
       const methodText = this.getMethodText(this.methodOrName.toLowerCase());
       const embed = new EmbedBuilder()
         .setTitle(`${this.pokemonName} ${versionText}`)
-        .setURL(`${this.returnUrl}${pokemonMoves[0].pokemonIdd}&versionId=${this.versionId}`)
+        .setURL(`${this.returnUrl}${pokemonMoves[0].pokemonId}&versionId=${this.versionId}`)
         .addFields(
           {
             name: `${methodText} Moves`,
@@ -116,7 +116,7 @@ class MoveSearchResponse extends BaseResponse {
 
       const embed = new EmbedBuilder()
         .setTitle(`${this.pokemonName} ${versionText}`)
-        .setURL(`${this.returnUrl}${pokemonMoves[0].id}&versionId=${this.versionId}`)
+        .setURL(`${this.returnUrl}${pokemonMoves[0].pokemonId}&versionId=${this.versionId}`)
         .setDescription(`${this.methodOrName}`)
         .addFields(
           {
