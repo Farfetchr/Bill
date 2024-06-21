@@ -39,7 +39,7 @@ class Response {
   }
 
   buildAbilities(pokemon, embed) {
-    if (!this.versionId || this.versionId >= 3) {
+    if (!this.versionId || this.versionId >= 5) {
       embed.addFields(
         { name: "\u200B", value: "\u200B" },
         {
