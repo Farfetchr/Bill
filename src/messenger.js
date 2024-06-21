@@ -18,8 +18,6 @@ class Messenger {
       if (piped.length > 1) {
         pokemonName = piped[0].trim();
         versionText = piped[1].trim();
-        console.log(pokemonName);
-        console.log(versionText);
       } else {
         pokemonName = match;
       }
