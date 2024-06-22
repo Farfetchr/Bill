@@ -27,10 +27,10 @@ class TypeEffectivenessResponse extends BaseResponse {
     getTypeEffectiveness(type1, type2).forEach((value, key) => {
       switch(value) {
         case 0.25:
-          resistanceString += `${key} 1/4x\n`;
+          resistanceString += `${key} ¼x\n`;
           break;
         case 0.5:
-          resistanceString += `${key} 1/2x\n`;
+          resistanceString += `${key} ½x\n`;
           break;
         case 0:
           immunityString += `${key} 0x\n`;
