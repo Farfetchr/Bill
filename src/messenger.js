@@ -2,6 +2,7 @@ const NameSearchResponse = require("./responses/nameSearchResponse");
 const MoveSearchResponse = require("./responses/moveSearchResponse");
 const TypeEffectivenessResponse = require("./responses/typeEffectivenessResponse");
 const ImageResponse = require("./responses/imageResponse");
+const ErrorResponse = require("./responses/errorResponse");
 
 class Messenger {
   constructor(client, msg) {
@@ -20,18 +21,21 @@ class Messenger {
 
       if (match.startsWith('!')) {
         const firstSpaceIndex = match.indexOf(' ');
-        pokemonName = match.substring(1, firstSpaceIndex);
-
-        let methodOrName = "";
-
-        if (piped.length > 1) {
-          methodOrName = piped[0].substring(firstSpaceIndex + 1).trim();
-          versionText = piped[1].trim();
+        if (firstSpaceIndex === -1) {
+          const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower)`);
+          this.promises.push(promise);
         } else {
-          methodOrName = match.substring(firstSpaceIndex + 1);
+          let methodOrName = "";
+
+          if (piped.length > 1) {
+            methodOrName = piped[0].substring(firstSpaceIndex + 1).trim();
+            versionText = piped[1].trim();
+          } else {
+            methodOrName = match.substring(firstSpaceIndex + 1);
+          }
+          const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
+          this.promises.push(promise);
         }
-        const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
-        this.promises.push(promise);
       } else {
         if (piped.length > 1) {
           pokemonName = piped[0].trim();
@@ -105,6 +109,20 @@ class Messenger {
     return new Promise((resolve, reject) => {
       try {
         new ImageResponse(this.client, pokemonName, versionText)
+          .embed()
+          .then((embed) => {
+            resolve(embed);
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  makeErrorPromise(errorText) {
+    return new Promise((resolve, reject) => {
+      try {
+        new ErrorResponse(errorText)
           .embed()
           .then((embed) => {
             resolve(embed);
