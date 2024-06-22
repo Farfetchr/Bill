@@ -1,6 +1,7 @@
 const NameSearchResponse = require("./responses/nameSearchResponse");
 const MoveSearchResponse = require("./responses/moveSearchResponse");
 const TypeEffectivenessResponse = require("./responses/typeEffectivenessResponse");
+const ImageResponse = require("./responses/imageResponse");
 
 class Messenger {
   constructor(client, msg) {
@@ -41,6 +42,8 @@ class Messenger {
         let promise;
         if (match.startsWith('#')) {
           promise = this.makeTypeEffectivenessPromise(pokemonName.substring(1), versionText);
+        } else if (match.startsWith('^')) {
+          promise = this.makeImagePromise(pokemonName.substring(1), versionText);
         } else {
           promise = this.makeNameSearchPromise(pokemonName, versionText);
         }
@@ -88,6 +91,20 @@ class Messenger {
     return new Promise((resolve, reject) => {
       try {
         new TypeEffectivenessResponse(this.client, pokemonName, versionText)
+          .embed()
+          .then((embed) => {
+            resolve(embed);
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  makeImagePromise(pokemonName, versionText) {
+    return new Promise((resolve, reject) => {
+      try {
+        new ImageResponse(this.client, pokemonName, versionText)
           .embed()
           .then((embed) => {
             resolve(embed);

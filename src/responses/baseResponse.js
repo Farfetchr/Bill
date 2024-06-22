@@ -30,8 +30,8 @@ class BaseResponse {
 
 
 BaseResponse.prototype.middleware = [typemoji, utm];
-BaseResponse.prototype.url = "http://localhost:5000/api/Bill/";
-// BaseResponse.prototype.url = "https://farfetchr.io/api/Bill/";
+// BaseResponse.prototype.url = "http://localhost:5000/api/Bill/";
+BaseResponse.prototype.url = "https://farfetchr.io/api/Bill/";
 BaseResponse.prototype.returnUrl = "https://farfetchr.io/pokemon?id=";
 BaseResponse.prototype.iconURL =
   "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/farfetchr.png";
