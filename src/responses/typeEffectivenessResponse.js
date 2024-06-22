@@ -1,10 +1,10 @@
 const BaseResponse = require("./baseResponse");
 const { getVersionId } = require("../utils/versionUtils");
-const { getTypeColor } = require("../utils/typeUtils");
+const { getTypeEffectiveness, getTypeColor} = require("../utils/typeUtils");
 
 const { EmbedBuilder } = require("@discordjs/builders");
 
-class NameSearchResponse extends BaseResponse {
+class TypeEffectivenessResponse extends BaseResponse {
   constructor(client, pokemonName, versionText) {
     super(client, pokemonName, versionText);
   }
@@ -18,39 +18,39 @@ class NameSearchResponse extends BaseResponse {
     }
   }
 
-  buildAbilities(pokemon, embed) {
-    if (!this.versionId || this.versionId >= 5) {
-      embed.addFields(
-        { name: "\u200B", value: "\u200B" },
-        {
-          name: "Abilities",
-          value: `${pokemon.ability1.name}\n${
-            pokemon.ability2 ? pokemon.ability2.name : "\u200B"
-          }`,
-          inline: true,
-        }
-      );
-      if (!this.versionId || this.versionId == 11 || this.versionId >= 14) {
-        if (pokemon.hiddenAbility) {
-          embed.addFields({
-            name: "Hidden Ability",
-            value: pokemon.hiddenAbility.name,
-            inline: true,
-          });
-        }
-      }
+  getEffectivenessFields(type1, type2) {
+    let neutralString = "\u200B";
+    let weaknessString = "\u200B";
+    let resistanceString = "\u200B";
+    let immunityString = "\u200B";
 
-      if (pokemon.teraAbility) {
-        embed.addFields({
-          name: "Terastallized Ability",
-          value: pokemon.teraAbility.name,
-          inline: true,
-        });
+    getTypeEffectiveness(type1, type2).forEach((value, key) => {
+      switch(value) {
+        case 0.25:
+          resistanceString += `${key} 1/4x\n`;
+          break;
+        case 0.5:
+          resistanceString += `${key} 1/2x\n`;
+          break;
+        case 0:
+          immunityString += `${key} 0x\n`;
+          break;
+        case 1.0:
+          neutralString += `${key} 1x\n`;
+          break;
+        case 2.0:
+          weaknessString += `${key} 2x\n`;
+          break;
+        case 4.0:
+          weaknessString += `${key} 4x\n`;
+          break;
       }
-    }
+    });
+
+    return [neutralString, weaknessString, resistanceString, immunityString];
   }
 
-  createPokemonEmbed(response) {
+  createTypeEmbed(response) {
     const pokemon = JSON.parse(response.body);
     if (pokemon.id) {
       const type = pokemon.type2
@@ -61,18 +61,32 @@ class NameSearchResponse extends BaseResponse {
         ? `(${this.versionText.toUpperCase()})`
         : "";
       const versionParam = this.versionText ? `&versionId=${this.versionId}` : '';
+
+      const typeEffectivenessFields = this.getEffectivenessFields(pokemon.type1, pokemon.type2);
+
       const embed = new EmbedBuilder()
         .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
         .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
         .addFields(
           {
-            name: "Stats",
-            value: `HP: ${pokemon.hp}\nAtk: ${pokemon.attack}\nDef: ${pokemon.defense}`,
+            name: "Neutral",
+            value: typeEffectivenessFields[0],
             inline: true,
           },
           {
-            name: "\u200B",
-            value: `SpAtk: ${pokemon.specAttack}\nSpDef: ${pokemon.specDefense}\nSpeed: ${pokemon.speed}`,
+            name: "Weaknesses",
+            value: typeEffectivenessFields[1],
+            inline: true,
+          },
+          { name: "\u200B", value: "\u200B" },
+          {
+            name: "Resistances",
+            value: typeEffectivenessFields[2],
+            inline: true,
+          },
+          {
+            name: "Immunities",
+            value: typeEffectivenessFields[3],
             inline: true,
           }
         )
@@ -83,8 +97,6 @@ class NameSearchResponse extends BaseResponse {
             ".png"
         )
         .setDescription(`${type}`);
-
-      this.buildAbilities(pokemon, embed);
       return embed;
     } else {
       const embed = new EmbedBuilder()
@@ -99,10 +111,10 @@ class NameSearchResponse extends BaseResponse {
     }
   }
 
-  standardEmbed() {
+  embed() {
     return new Promise((resolve, reject) => {
       this.makeRequest().then((response) => {
-        let embed = this.createPokemonEmbed(response);
+        let embed = this.createTypeEmbed(response);
         this.middleware.length > 0 &&
           this.middleware.forEach((mw) => {
             embed = mw(this.client, embed);
@@ -113,4 +125,4 @@ class NameSearchResponse extends BaseResponse {
   }
 }
 
-module.exports = NameSearchResponse;
+module.exports = TypeEffectivenessResponse;

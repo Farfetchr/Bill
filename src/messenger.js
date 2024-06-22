@@ -1,5 +1,6 @@
 const NameSearchResponse = require("./responses/nameSearchResponse");
 const MoveSearchResponse = require("./responses/moveSearchResponse");
+const TypeEffectivenessResponse = require("./responses/typeEffectivenessResponse");
 
 class Messenger {
   constructor(client, msg) {
@@ -37,8 +38,12 @@ class Messenger {
         } else {
           pokemonName = match;
         }
-
-        const promise = this.makeNameSearchPromise(pokemonName, versionText);
+        let promise;
+        if (match.startsWith('#')) {
+          promise = this.makeTypeEffectivenessPromise(pokemonName.substring(1), versionText);
+        } else {
+          promise = this.makeNameSearchPromise(pokemonName, versionText);
+        }
         this.promises.push(promise);
       }
     }
@@ -70,6 +75,20 @@ class Messenger {
       try {
         new MoveSearchResponse(this.client, pokemonName, methodOrName, versionText)
           .moveEmbed()
+          .then((embed) => {
+            resolve(embed);
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  makeTypeEffectivenessPromise(pokemonName, versionText) {
+    return new Promise((resolve, reject) => {
+      try {
+        new TypeEffectivenessResponse(this.client, pokemonName, versionText)
+          .embed()
           .then((embed) => {
             resolve(embed);
           });

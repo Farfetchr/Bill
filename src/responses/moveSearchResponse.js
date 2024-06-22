@@ -1,5 +1,5 @@
 const BaseResponse = require("./baseResponse");
-const { getVersionId, getTypeColor } = require("../utils");
+const { getVersionId } = require("../utils/versionUtils");
 
 const { EmbedBuilder } = require("@discordjs/builders");
 
