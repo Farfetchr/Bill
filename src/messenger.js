@@ -28,9 +28,11 @@ class Messenger {
           let methodOrName = "";
 
           if (piped.length > 1) {
+            pokemonName = piped[0].substring(1, firstSpaceIndex);
             methodOrName = piped[0].substring(firstSpaceIndex + 1).trim();
             versionText = piped[1].trim();
           } else {
+            pokemonName = match.substring(1, firstSpaceIndex);
             methodOrName = match.substring(firstSpaceIndex + 1);
           }
           const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
