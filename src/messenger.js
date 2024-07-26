@@ -2,6 +2,7 @@ const NameSearchResponse = require("./responses/nameSearchResponse");
 const MoveSearchResponse = require("./responses/moveSearchResponse");
 const TypeEffectivenessResponse = require("./responses/typeEffectivenessResponse");
 const ImageResponse = require("./responses/imageResponse");
+const FormResponse = require("./responses/formResponse");
 const ErrorResponse = require("./responses/errorResponse");
 
 class Messenger {
@@ -21,23 +22,18 @@ class Messenger {
 
       if (match.startsWith('!')) {
         const firstSpaceIndex = match.indexOf(' ');
-        if (firstSpaceIndex === -1) {
-          const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower)`);
-          this.promises.push(promise);
-        } else {
           let methodOrName = "";
 
           if (piped.length > 1) {
-            pokemonName = piped[0].substring(1, firstSpaceIndex);
-            methodOrName = piped[0].substring(firstSpaceIndex + 1).trim();
-            versionText = piped[1].trim();
+            pokemonName = piped[0].substring(1).trimEnd();
+            methodOrName = piped[1].trimStart().trimEnd();
+            versionText = piped.length > 2 ? piped[2].trim() : "";
           } else {
-            pokemonName = match.substring(1, firstSpaceIndex);
-            methodOrName = match.substring(firstSpaceIndex + 1);
+            const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower)`);
+            this.promises.push(promise);
           }
           const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
           this.promises.push(promise);
-        }
       } else {
         if (piped.length > 1) {
           pokemonName = piped[0].trim();
@@ -50,6 +46,8 @@ class Messenger {
           promise = this.makeTypeEffectivenessPromise(pokemonName.substring(1), versionText);
         } else if (match.startsWith('^')) {
           promise = this.makeImagePromise(pokemonName.substring(1), versionText);
+        } else if (match.startsWith('*')) {
+          promise = this.makeFormsPromise(pokemonName.substring(1));
         } else {
           promise = this.makeNameSearchPromise(pokemonName, versionText);
         }
@@ -115,6 +113,20 @@ class Messenger {
           .then((embed) => {
             resolve(embed);
           });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  makeFormsPromise(pokemonName, versionText) {
+    return new Promise((resolve, reject) => {
+      try {
+        new FormResponse(this.client, pokemonName)
+        .embed()
+        .then((embed) => {
+          resolve(embed);
+        });
       } catch (err) {
         reject(err);
       }
