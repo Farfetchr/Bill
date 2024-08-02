@@ -14,53 +14,56 @@ class Messenger {
 
     const matches = msg.content.match(this.pattern);
     if (matches) {
-      const match = matches[0].replaceAll("{", "").replaceAll("}", "");
-      const piped = match.split("|");
+      matches.forEach(match => {
+        match = match.replaceAll("{", "").replaceAll("}", "");
+        const piped = match.split("|");
 
-      let pokemonName = "";
-      let versionText = "";
+        let pokemonName = "";
+        let versionText = "";
 
-      if (match.startsWith('!')) {
-        const firstSpaceIndex = match.indexOf(' ');
+        if (match.startsWith('!')) {
+          const firstSpaceIndex = match.indexOf(' ');
           let methodOrName = "";
 
           if (piped.length > 1) {
             pokemonName = piped[0].substring(1).trimEnd();
             methodOrName = piped[1].trimStart().trimEnd();
             versionText = piped.length > 2 ? piped[2].trim() : "";
+            const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
+            this.promises.push(promise);
           } else {
             const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower)`);
             this.promises.push(promise);
           }
-          const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
+        } else {
+          if (piped.length > 1) {
+            pokemonName = piped[0].trim();
+            versionText = piped[1].trim();
+          } else {
+            pokemonName = match;
+          }
+          let promise;
+          if (match.startsWith('#')) {
+            promise = this.makeTypeEffectivenessPromise(pokemonName.substring(1), versionText);
+          } else if (match.startsWith('^')) {
+            promise = this.makeImagePromise(pokemonName.substring(1), versionText);
+          } else if (match.startsWith('*')) {
+            promise = this.makeFormsPromise(pokemonName.substring(1));
+          } else {
+            promise = this.makeNameSearchPromise(pokemonName, versionText);
+          }
           this.promises.push(promise);
-      } else {
-        if (piped.length > 1) {
-          pokemonName = piped[0].trim();
-          versionText = piped[1].trim();
-        } else {
-          pokemonName = match;
         }
-        let promise;
-        if (match.startsWith('#')) {
-          promise = this.makeTypeEffectivenessPromise(pokemonName.substring(1), versionText);
-        } else if (match.startsWith('^')) {
-          promise = this.makeImagePromise(pokemonName.substring(1), versionText);
-        } else if (match.startsWith('*')) {
-          promise = this.makeFormsPromise(pokemonName.substring(1));
-        } else {
-          promise = this.makeNameSearchPromise(pokemonName, versionText);
-        }
-        this.promises.push(promise);
-      }
+      });
+
+      Promise.all(this.promises)
+        .then((embeds) => {
+          embeds.forEach((embed) => {
+            this.msg.channel.send({ embeds: [embed] });
+          });
+        })
+        .catch((err) => console.log(err));
     }
-    Promise.all(this.promises)
-      .then((embeds) => {
-        embeds.forEach((embed) => {
-          this.msg.channel.send({ embeds: [embed] });
-        });
-      })
-      .catch((err) => console.log(err));
   }
 
   makeNameSearchPromise(pokemonName, versionText) {
@@ -123,10 +126,10 @@ class Messenger {
     return new Promise((resolve, reject) => {
       try {
         new FormResponse(this.client, pokemonName)
-        .embed()
-        .then((embed) => {
-          resolve(embed);
-        });
+          .embed()
+          .then((embed) => {
+            resolve(embed);
+          });
       } catch (err) {
         reject(err);
       }

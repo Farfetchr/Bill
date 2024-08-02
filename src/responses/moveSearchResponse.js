@@ -21,6 +21,7 @@ class MoveSearchResponse extends BaseResponse {
   getMethodText(method) {
     switch (method) {
       case 'lvl':
+      case 'level':
         return 'Level Up';
       case 'egg':
         return 'Egg';

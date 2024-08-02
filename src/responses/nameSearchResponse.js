@@ -62,7 +62,7 @@ class NameSearchResponse extends BaseResponse {
         : "";
       const versionParam = this.versionText ? `&versionId=${this.versionId}` : '';
       const embed = new EmbedBuilder()
-        .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
+        .setTitle(`${pokemon.name.charAt(0).toUpperCase() + pokemon.name.toLowerCase().slice(1)} #${pokemon.pokedexNumber} ${versionText}`)
         .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
         .addFields(
           {
