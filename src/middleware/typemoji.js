@@ -26,17 +26,25 @@ const emojiMap = {
 };
 module.exports = (client, embed) => {
   function typemoji(str) {
-    Object.keys(emojiMap)
-      .forEach(t => {
-        const emoji = client.emojis.cache.find(e => e.name === emojiMap[t]);
-        if (t.endsWith('x')) {
-          str = str.replaceAll(t, emoji ? `<:${emoji.name}:${emoji.id}>` : t);
-        } else {
-          str = str.replace(t, emoji ? `${t} <:${emoji.name}:${emoji.id}>` : t);
+    const words = str.split(' ');
+    let retStr = [];
+    words.forEach(word => {
+      Object.keys(emojiMap)
+        .forEach(t => {
+          const emoji = client.emojis.cache.find(e => e.name === emojiMap[t]);
+          if (t.endsWith('x')) {
+            word = word.replaceAll(t, emoji ? `<:${emoji.name}:${emoji.id}>` : t);
+          } else {
+            if (word.toLowerCase() == t.toLowerCase()){
+              word = word.replace(t, emoji ? `${t} <:${emoji.name}:${emoji.id}>` : t);
+            }
+          }
         }
-      }
-    );
-    return str;
+      );
+      retStr.push(word);
+    })
+    
+    return retStr.join(' ');
   }
 
   function isTypeField(name) {
