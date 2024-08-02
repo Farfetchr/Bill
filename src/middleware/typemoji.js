@@ -26,6 +26,11 @@ const emojiMap = {
 };
 module.exports = (client, embed) => {
   function typemoji(str) {
+    // Cornercase for exactly Gouging Fire
+    if (str.trim() == 'Gouging Fire') {
+      return str;
+    }
+
     const words = str.split(' ');
     let retStr = [];
     words.forEach(word => {
