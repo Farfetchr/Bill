@@ -32,7 +32,7 @@ class Messenger {
             const promise = this.makeMoveSearchPromise(pokemonName, methodOrName, versionText);
             this.promises.push(promise);
           } else {
-            const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower)`);
+            const promise = this.makeErrorPromise(`No method or move name found in {{${match}}}. Please provide a method or move name (Level/TM/Egg/Tutor/Flamethrower). e.g. {{!${match} | TM}}`);
             this.promises.push(promise);
           }
         } else {
