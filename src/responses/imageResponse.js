@@ -25,7 +25,7 @@ class ImageResponse extends BaseResponse {
     const pokemon = JSON.parse(response.body);
     if (pokemon.id) {
       const embed = new EmbedBuilder()
-      .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
+      .setTitle(`${this.formatName(pokemon.name)}#${pokemon.pokedexNumber} ${versionText}`)
       .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
       .setImage("https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/" +
       pokemon.id +

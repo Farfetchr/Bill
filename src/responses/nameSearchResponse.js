@@ -54,15 +54,18 @@ class NameSearchResponse extends BaseResponse {
     const pokemon = JSON.parse(response.body);
     if (pokemon.id) {
       const type = pokemon.type2
-        ? `${pokemon.type1}/${pokemon.type2}`
+        ? `${pokemon.type1} / ${pokemon.type2}`
         : `${pokemon.type1}`;
       const color = getTypeColor(pokemon.type1.toLowerCase());
       const versionText = this.versionText
         ? `(${this.versionText.toUpperCase()})`
         : "";
       const versionParam = this.versionText ? `&versionId=${this.versionId}` : '';
+
+      const nameParts = pokemon.name.split(' ');
+
       const embed = new EmbedBuilder()
-        .setTitle(`${pokemon.name.charAt(0).toUpperCase() + pokemon.name.toLowerCase().slice(1)} #${pokemon.pokedexNumber} ${versionText}`)
+        .setTitle(`${this.formatName(pokemon.name)}#${pokemon.pokedexNumber} ${versionText}`)
         .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
         .addFields(
           {

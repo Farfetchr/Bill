@@ -54,7 +54,7 @@ class TypeEffectivenessResponse extends BaseResponse {
     const pokemon = JSON.parse(response.body);
     if (pokemon.id) {
       const type = pokemon.type2
-        ? `${pokemon.type1}/${pokemon.type2}`
+        ? `${pokemon.type1} / ${pokemon.type2}`
         : `${pokemon.type1}`;
       const color = getTypeColor(pokemon.type1.toLowerCase());
       const versionText = this.versionText
@@ -65,7 +65,7 @@ class TypeEffectivenessResponse extends BaseResponse {
       const typeEffectivenessFields = this.getEffectivenessFields(pokemon.type1, pokemon.type2);
 
       const embed = new EmbedBuilder()
-        .setTitle(`${pokemon.name} #${pokemon.pokedexNumber} ${versionText}`)
+        .setTitle(`${this.formatName(pokemon.name)}#${pokemon.pokedexNumber} ${versionText}`)
         .setURL(`${this.returnUrl}${pokemon.id}${versionParam}`)
         .addFields(
           {
