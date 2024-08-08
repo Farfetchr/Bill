@@ -50,6 +50,7 @@ TypeResistances.set(Types.FIRE, [Types.FIRE, Types.GRASS, Types.ICE, Types.STEEL
 TypeResistances.set(Types.WATER, [Types.FIRE, Types.WATER, Types.ICE, Types.STEEL]);
 TypeResistances.set(Types.ELECTRIC, [Types.ELECTRIC, Types.STEEL]);
 TypeResistances.set(Types.GRASS, [Types.WATER, Types.ELECTRIC, Types.GRASS, Types.GROUND]);
+TypeResistances.set(Types.ICE, [Types.ICE]);
 TypeResistances.set(Types.FIGHTING, [Types.BUG, Types.ROCK, Types.DARK]);
 TypeResistances.set(Types.POISON, [Types.GRASS, Types.FIGHTING, Types.POISON, Types.BUG, Types.FAIRY]);
 TypeResistances.set(Types.GROUND, [Types.POISON, Types.ROCK]);
