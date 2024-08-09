@@ -17,10 +17,8 @@ const emojiMap = {
   'Rock' : 'typerock',
   'Steel' : 'typesteel',
   'Water' : 'typewater',
-  '0x' : 'effectimmune',
   '½x' : 'effectresistance',
   '¼x' : 'effectdoubleresistance',
-  '1x' : 'effectneutral',
   '2x' : 'effectweakness',
   '4x' : 'effectdoubleweakness',
 };

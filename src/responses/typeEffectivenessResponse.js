@@ -33,10 +33,10 @@ class TypeEffectivenessResponse extends BaseResponse {
           resistanceString += `${key} ½x\n`;
           break;
         case 0:
-          immunityString += `${key} 0x\n`;
+          immunityString += `${key} \n`;
           break;
         case 1.0:
-          neutralString += `${key} 1x\n`;
+          neutralString += `${key} \n`;
           break;
         case 2.0:
           weaknessString += `${key} 2x\n`;
