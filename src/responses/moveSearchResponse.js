@@ -172,10 +172,6 @@ class MoveSearchResponse extends BaseResponse {
           embed = this.createMoveSearchEmbed(response);
         }
 
-        this.middleware.length > 0 &&
-          this.middleware.forEach((mw) => {
-            embed = mw(this.client, embed);
-          });
         resolve(embed);
       });
     });
