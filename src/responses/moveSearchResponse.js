@@ -34,14 +34,6 @@ class MoveSearchResponse extends BaseResponse {
     }
   }
 
-  getMethod(pokemonMove) {
-
-  }
-
-  buildMoveList(moves) {
-
-  }
-
   createMoveListEmbed(response) {
     const pokemonMoves = JSON.parse(response.body);
     if (pokemonMoves.length > 0) {
@@ -49,25 +41,48 @@ class MoveSearchResponse extends BaseResponse {
         ? `(${this.versionText.toUpperCase()})`
         : "";
 
+      const isLevel = this.methodOrName == "level" || this.methodOrName == "lvl";
       let moves = "";
+      let levels = "";
       pokemonMoves.forEach(mv => {
-        moves += mv.name + '\n';
+        if (!moves.includes(mv.name)) {
+          moves += mv.name + '\n';
+          if (isLevel) {
+            levels += mv.levelLearned + '\n';
+          }
+        }
       });
       const methodText = this.getMethodText(this.methodOrName.toLowerCase());
       const embed = new EmbedBuilder()
-        .setTitle(`${this.formatName(pokemon.name)}${versionText}`)
+        .setTitle(`${this.formatName(this.pokemonName)}${versionText}`)
         .setURL(`${this.returnUrl}${pokemonMoves[0].pokemonId}&versionId=${this.versionId}`)
-        .addFields(
-          {
-            name: `${methodText} Moves`,
-            value: moves,
-          },
-        )
         .setThumbnail(
           "https://farfetchr-pokemon-images.s3.us-west-1.amazonaws.com/" +
           pokemonMoves[0].pokemonId +
           ".png"
         );
+
+        if(isLevel) {
+          embed.addFields(
+            {
+              name: `Level`,
+              value: levels,
+              inline: true,
+            },
+            {
+              name: `${methodText} Moves`,
+              value: moves,
+              inline: true,
+            }
+          );
+        } else {
+          embed.addFields(
+            {
+              name: `${methodText} Moves`,
+              value: moves,
+            }
+          );
+        }
       return embed;
     } else {
       const endText = this.versionText ? `in ${this.versionText}` : '';
